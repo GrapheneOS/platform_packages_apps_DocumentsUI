@@ -87,6 +87,7 @@ public class State implements android.os.Parcelable {
 
     public boolean allowMultiple;
     public boolean localOnly;
+    public ArrayList<String> allowedAuthorities;
 
     public boolean openableOnly;
     public boolean restrictScopeStorage;
@@ -192,6 +193,7 @@ public class State implements android.os.Parcelable {
         out.writeStringArray(acceptMimes);
         out.writeInt(allowMultiple ? 1 : 0);
         out.writeInt(localOnly ? 1 : 0);
+        out.writeStringList(allowedAuthorities);
         DurableUtils.writeToParcel(out, stack);
         out.writeMap(dirConfigs);
         out.writeList(excludedAuthorities);
@@ -229,6 +231,7 @@ public class State implements android.os.Parcelable {
             state.acceptMimes = in.createStringArray();
             state.allowMultiple = in.readInt() != 0;
             state.localOnly = in.readInt() != 0;
+            state.allowedAuthorities = in.createStringArrayList();
             DurableUtils.readFromParcel(in, state.stack);
             in.readMap(state.dirConfigs, loader);
             in.readList(state.excludedAuthorities, loader);
