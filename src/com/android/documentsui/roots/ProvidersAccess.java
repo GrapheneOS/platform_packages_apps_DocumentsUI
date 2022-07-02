@@ -103,6 +103,11 @@ public interface ProvidersAccess {
                 continue;
             }
 
+            if (state.allowedAuthorities != null && root.authority != null && !state.allowedAuthorities.contains(root.authority)) {
+                if (VERBOSE) Log.v(tag, "excluded " + root.authority + " " + root);
+                continue;
+            }
+
             if (state.action == State.ACTION_OPEN && root.isEmpty()) {
                 if (VERBOSE) Log.v(tag, "Excluding empty root because: ACTION_OPEN.");
                 continue;
