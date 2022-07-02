@@ -399,6 +399,7 @@ public abstract class BaseActivity
 
         state.sortModel = SortModel.createModel();
         state.localOnly = intent.getBooleanExtra(Intent.EXTRA_LOCAL_ONLY, false);
+        state.allowedAuthorities = intent.getStringArrayListExtra(Intent.EXTRA_RESTRICTIONS_LIST);
         state.excludedAuthorities = getExcludedAuthorities();
         state.restrictScopeStorage = Shared.shouldRestrictStorageAccessFramework(this);
         state.showHiddenFiles = LocalPreferences.getShowHiddenFiles(
