@@ -99,6 +99,7 @@ public class State implements android.os.Parcelable {
     public Set<Integer> excludedUserIds = Collections.emptySet();
 
     public boolean localOnly;
+    public ArrayList<String> allowedAuthorities;
 
     public boolean openableOnly;
     public boolean restrictScopeStorage;
@@ -249,6 +250,7 @@ public class State implements android.os.Parcelable {
         out.writeStringArray(acceptMimes);
         out.writeInt(allowMultiple ? 1 : 0);
         out.writeInt(localOnly ? 1 : 0);
+        out.writeStringList(allowedAuthorities);
         DurableUtils.writeToParcel(out, stack);
         if (isHomeScreenFilesFlagEnabled()) {
             out.writeBoolean(/*has shortcut*/ shortcut != null);
@@ -300,6 +302,7 @@ public class State implements android.os.Parcelable {
             state.acceptMimes = in.createStringArray();
             state.allowMultiple = in.readInt() != 0;
             state.localOnly = in.readInt() != 0;
+            state.allowedAuthorities = in.createStringArrayList();
             DurableUtils.readFromParcel(in, state.stack);
             if (isHomeScreenFilesFlagEnabled()) {
                 boolean hasShortcut = in.readBoolean();
