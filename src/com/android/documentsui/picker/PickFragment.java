@@ -181,9 +181,9 @@ public class PickFragment extends Fragment {
                 mPick.setText(getString(R.string.open_tree_button));
                 mPick.setWidth(Integer.MAX_VALUE);
                 mCancel.setVisibility(View.GONE);
-                mPick.setEnabled(!(mPickTarget.isBlockedFromTree() && mRestrictScopeStorage));
+                mPick.setEnabled(!(mPickTarget.isBlockedFromTree(getContext()) && mRestrictScopeStorage));
                 mPickOverlay.setVisibility(
-                        mPickTarget.isBlockedFromTree() && mRestrictScopeStorage
+                        mPickTarget.isBlockedFromTree(getContext()) && mRestrictScopeStorage
                                 ? View.VISIBLE
                                 : View.GONE);
                 break;
