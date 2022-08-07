@@ -19,8 +19,10 @@ package com.android.documentsui.base;
 import static com.android.documentsui.base.SharedMinimal.DEBUG;
 import static com.android.documentsui.base.SharedMinimal.redact;
 
+import android.app.Activity;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.FileUtils;
@@ -308,6 +310,20 @@ public class DocumentInfo implements Durable, Parcelable {
 
     public boolean isPartial() {
         return (flags & Document.FLAG_PARTIAL) != 0;
+    }
+
+    public boolean isBlockedFromTree(Context context) {
+        if (DocumentsContract.EXTERNAL_STORAGE_PROVIDER_AUTHORITY.equals(authority)
+                && "primary:Download".equals(documentId)
+                && (context instanceof Activity))
+        {
+            Activity a = (Activity) context;
+            if ("com.android.permissioncontroller".equals(a.getCallingPackage())) {
+                return false;
+            }
+        }
+
+        return isBlockedFromTree();
     }
 
     public boolean isBlockedFromTree() {
