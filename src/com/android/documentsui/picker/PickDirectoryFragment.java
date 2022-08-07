@@ -193,7 +193,7 @@ public class PickDirectoryFragment extends Fragment {
                     mCancel.setVisibility(View.GONE);
                     mPick.setWidth(Integer.MAX_VALUE);
                     mPickOverlay.setVisibility(
-                            mPickTarget.isBlockedFromTree() && mRestrictScopeStorage
+                            mPickTarget.isBlockedFromTree(getContext()) && mRestrictScopeStorage
                                     ? View.VISIBLE
                                     : View.GONE);
                 } else {
@@ -206,11 +206,11 @@ public class PickDirectoryFragment extends Fragment {
                                     : View.GONE;
                     mCancel.setVisibility(cancelVisibility);
                     mPickOverlay.setVisibility(
-                            mPickTarget.isBlockedFromTree() && mRestrictScopeStorage
+                            mPickTarget.isBlockedFromTree(getContext()) && mRestrictScopeStorage
                                     ? View.VISIBLE
                                     : View.GONE);
                 }
-                mPick.setEnabled(!(mPickTarget.isBlockedFromTree() && mRestrictScopeStorage));
+                mPick.setEnabled(!(mPickTarget.isBlockedFromTree(getContext()) && mRestrictScopeStorage));
                 break;
             case State.ACTION_PICK_COPY_DESTINATION:
                 int titleId;
