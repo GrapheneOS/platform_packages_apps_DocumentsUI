@@ -237,14 +237,16 @@ public class MediaView extends TableView implements MediaDisplay {
                 assert (coords.length == 2);
                 Geocoder geocoder = new Geocoder(mContext);
                 try {
-                    Address address =
+                    var list =
                             geocoder.getFromLocation(
                                             coords[0], // latitude
                                             coords[1], // longitude
                                             1 // amount of results returned
-                                            )
-                                    .get(0);
-                    return address;
+                                            );
+                    if (list != null && list.size() != 0) {
+                        return list.get(0);
+                    }
+                    return null;
                 } catch (IOException e) {
                     return null;
                 }
