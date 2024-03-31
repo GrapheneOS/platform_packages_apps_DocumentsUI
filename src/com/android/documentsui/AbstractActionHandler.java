@@ -540,8 +540,8 @@ public abstract class AbstractActionHandler<T extends FragmentActivity & CommonA
 
         // management is only supported in Downloads root or downloaded files show in Recent root.
         if (Providers.AUTHORITY_DOWNLOADS.equals(doc.authority)) {
-            // only on APKs or partial files.
-            return MimeTypes.isApkType(doc.mimeType) || doc.isPartial();
+            // only on partial files.
+            return doc.isPartial();
         }
 
         return false;
