@@ -321,8 +321,6 @@ public class DirectoryFragment extends Fragment implements SwipeRefreshLayout.On
                 }
                 mActivity.refreshCurrentRootAndDirectory(AnimationView.ANIM_NONE);
             }
-        } else {
-            checkUriAndScheduleCheckIfNeeded(userId);
         }
     }
 
@@ -1387,11 +1385,16 @@ public class DirectoryFragment extends Fragment implements SwipeRefreshLayout.On
         // Remove thumbnail cache. We do this not because we're worried about stale thumbnails as it
         // should be covered by last modified value we store in thumbnail cache, but rather to give
         // the user a greater sense that contents are being reloaded.
-        ThumbnailCache cache = DocumentsApplication.getThumbnailCache(getContext());
-        String[] ids = mModel.getModelIds();
-        int numOfEvicts = Math.min(ids.length, CACHE_EVICT_LIMIT);
-        for (int i = 0; i < numOfEvicts; ++i) {
-            cache.removeUri(mModel.getItemUri(ids[i]), mModel.getItemUserId(ids[i]));
+        Context context = getContext();
+        if (context == null) {
+            Log.w(TAG, "Fragment is not attached to an activity.");
+        } else {
+            ThumbnailCache cache = DocumentsApplication.getThumbnailCache(context);
+            String[] ids = mModel.getModelIds();
+            int numOfEvicts = Math.min(ids.length, CACHE_EVICT_LIMIT);
+            for (int i = 0; i < numOfEvicts; ++i) {
+                cache.removeUri(mModel.getItemUri(ids[i]), mModel.getItemUserId(ids[i]));
+            }
         }
 
         final DocumentInfo doc = mActivity.getCurrentDirectory();
