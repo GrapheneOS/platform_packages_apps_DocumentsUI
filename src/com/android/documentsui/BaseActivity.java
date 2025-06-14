@@ -546,7 +546,6 @@ public abstract class BaseActivity
             if (DEBUG) {
                 Log.d(mTag, "Recovered existing state object: " + state);
             }
-            state.configStore = mConfigStore;
             return state;
         }
 
