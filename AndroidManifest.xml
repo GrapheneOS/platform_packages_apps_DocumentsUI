@@ -49,6 +49,8 @@
     <!-- Permissions required for reading device configs -->
     <uses-permission android:name="android.permission.READ_DEVICE_CONFIG"/>
 
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
     <!-- Declaring the permission for apps wanting to launch DocsUI through the home screen. -->
     <permission
         android:name="com.android.documentsui.LAUNCH_FILE_MANAGER"
