@@ -1179,6 +1179,16 @@ public class DirectoryFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     /**
+     * Redraw file items if their enabled state changed
+     * due to tapjacking protection.
+     */
+    public void refreshItems() {
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
      * If the zip_ng_ro flag is enabled, and if DocsUI is in file manager mode (i.e. not in file
      * picker mode), and if the activated item is a supported archive, and if this archive is
      * located in a writable folder, then this method starts unpacking the archive.

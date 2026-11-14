@@ -116,6 +116,11 @@ public class State implements android.os.Parcelable {
     public boolean canShareAcrossProfile = false;
 
     /**
+     * Represents whether tapjacking protection still in effect.
+     */
+    public boolean itemsDisabled = false;
+
+    /**
      * Returns true if we are allowed to interact with the user.
      */
     public boolean canInteractWith(UserId userId) {

@@ -945,6 +945,10 @@ public class RootsFragment extends Fragment {
         reloadRootsAndShortcuts(/* refreshRootAndDirectory= */ false);
     }
 
+    public void refreshItems() {
+        mListHandler.refreshItems();
+    }
+
     public void onCurrentRootChanged() {
         if (!mListHandler.isAdapterInitialized()) {
             return;

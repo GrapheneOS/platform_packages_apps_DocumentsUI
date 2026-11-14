@@ -97,6 +97,10 @@ internal class RootsListViewHandler(private val listView: ListView) : RootsListH
     listView.adapter = null
   }
 
+  override fun refreshItems() {
+    adapter?.notifyDataSetChanged()
+  }
+
   override fun onDisplayStateChange() {
     val state = baseActivity.displayState
 

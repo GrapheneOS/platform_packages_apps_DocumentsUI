@@ -146,7 +146,7 @@ public class AppsRowManager {
         for (AppsRowItemData data : mDataList) {
             if (selectedUser.equals(data.getUserId())) {
                 View item = inflater.inflate(getRes(R.layout.apps_item), appsGroup, false);
-                bindView(item, data);
+                bindView(item, data, activity);
                 appsGroup.addView(item);
             }
         }
@@ -154,7 +154,7 @@ public class AppsRowManager {
         appsRowLayout.setVisibility(appsGroup.getChildCount() > 0 ? View.VISIBLE : View.GONE);
     }
 
-    private void bindView(View view, AppsRowItemData data) {
+    private void bindView(View view, AppsRowItemData data, BaseActivity activity) {
         final ImageView app_icon = view.findViewById(getRes(R.id.app_icon));
         final TextView title = view.findViewById(android.R.id.title);
         final TextView summary = view.findViewById(getRes(R.id.summary));
@@ -166,6 +166,12 @@ public class AppsRowManager {
         summary.setText(data.getSummary());
         summary.setVisibility(data.getSummary() != null ? View.VISIBLE : View.GONE);
         view.setOnClickListener(v -> data.onClicked());
+
+        // Disable and gray out external app launchers while tapjacking
+        // protection is in effect. The external apps can submit files too.
+        final boolean enabled = !activity.getDisplayState().itemsDisabled;
+        view.setEnabled(enabled);
+        view.setAlpha(enabled ? 1.0f : 0.5f);
     }
 
     private List<UserId> getUserIds() {

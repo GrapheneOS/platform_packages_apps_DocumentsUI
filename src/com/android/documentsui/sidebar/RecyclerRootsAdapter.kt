@@ -75,8 +75,18 @@ class RecyclerRootsAdapter(
             if (item.isRoot || item.isShortcut) mDragListener else null
         )
 
-        val isEnabled = item !is SpacerItem
+        var isEnabled = item !is SpacerItem
+        var isFullyVisible = true
+        if (item is AppItem || item is RootAndAppItem) {
+            if (mActivity.displayState?.itemsDisabled == true) {
+                isEnabled = false
+                isFullyVisible = false
+            }
+        }
         holder.itemView.isEnabled = isEnabled
+        holder.itemView.alpha = if (isFullyVisible) 1.0f else 0.5f
+        holder.itemView.findViewById<View?>(getRes(R.id.action_icon))?.isEnabled = isEnabled
+        holder.itemView.findViewById<View?>(getRes(R.id.action_icon_area))?.isEnabled = isEnabled
         holder.itemView.isActivated = item.isSelected
         holder.itemView.isSelected = item.isSelected
 
