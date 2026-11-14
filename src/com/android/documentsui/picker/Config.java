@@ -63,6 +63,11 @@ final class Config extends ActivityConfig {
             return true;
         }
 
+        // Disable the item while tapjacking protection is in effect.
+        if (state.itemsDisabled) {
+            return false;
+        }
+
         switch (state.action) {
             case ACTION_PICK_COPY_DESTINATION:
                 return false;

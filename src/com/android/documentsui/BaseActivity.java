@@ -163,6 +163,15 @@ public abstract class BaseActivity
     private UserId mLastSelectedUser = null;
     private Locale mCurrentLocale;
 
+    private @Nullable Runnable mConfirmButtonUpdater;
+
+    // Runner that re-enables items and refreshes the views,
+    // once timer for tapjacking protection has elapsed.
+    private final Runnable mEnableItemsRunnable = () -> {
+        mState.itemsDisabled = false;
+        refreshItems();
+    };
+
     // Supplies the inline sync tick icon visibility duration.
     private Supplier<Integer> mTestTickDurationSupplier = null;
 
@@ -309,6 +318,16 @@ public abstract class BaseActivity
         initConfigStore();
 
         mState = getState(savedInstanceState);
+
+        // If file picker is opened by external app, make files
+        // unsubmittable for a second to prevent a tapjacking attack.
+        // Only for requests that would grant access to existing file data.
+        if (mState.action == State.ACTION_GET_CONTENT
+                || mState.action == State.ACTION_OPEN
+                || mState.action == State.ACTION_OPEN_TREE) {
+            mState.itemsDisabled = true;
+        }
+
         mDrawer = DrawerController.create(this, mInjector.config);
         Metrics.logActivityLaunch(mState, intent);
 
@@ -660,6 +679,60 @@ public abstract class BaseActivity
     }
 
     @Override
+    public void onTopResumedActivityChanged(boolean isTopResumedActivity) {
+        super.onTopResumedActivityChanged(isTopResumedActivity);
+
+        // If file picker is opened through external intent,
+        // require window to have been fully visible for a full
+        // second before items become submittable, to protect
+        // against a tapjacking attack.
+        if (mState.action == State.ACTION_GET_CONTENT
+                || mState.action == State.ACTION_OPEN
+                || mState.action == State.ACTION_OPEN_TREE) {
+            View decorView = getWindow().getDecorView();
+            if (isTopResumedActivity) {
+                decorView.postDelayed(mEnableItemsRunnable, 1000);
+            } else {
+                decorView.removeCallbacks(mEnableItemsRunnable);
+                mState.itemsDisabled = true;
+                refreshItems();
+            }
+        }
+    }
+
+    /**
+     * Redraw file items and app launchers if their enabled
+     * state changed due to tapjacking protection.
+     */
+    private void refreshItems() {
+        DirectoryFragment dir = getDirectoryFragment();
+        if (dir != null) {
+            dir.refreshItems();
+        }
+        if (mAppsRowManager != null) {
+            mAppsRowManager.updateView(this);
+        }
+        RootsFragment roots = getRootsFragment();
+        if (roots != null) {
+            roots.refreshItems();
+        }
+        RootsFragment navRailRoots = getNavRailRootsFragment();
+        if (navRailRoots != null) {
+            navRailRoots.refreshItems();
+        }
+        if (mConfirmButtonUpdater != null) {
+            mConfirmButtonUpdater.run();
+        }
+    }
+
+    public void setConfirmButtonUpdater(@Nullable Runnable updater) {
+        mConfirmButtonUpdater = updater;
+        if (updater != null) {
+            updater.run();
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         mLastSelectedUser = getSelectedUser();
@@ -720,6 +793,7 @@ public abstract class BaseActivity
 
     @Override
     protected void onDestroy() {
+        getWindow().getDecorView().removeCallbacks(mEnableItemsRunnable);
         mRootsMonitor.stop();
         mPreferencesMonitor.stop();
         mSortController.destroy();

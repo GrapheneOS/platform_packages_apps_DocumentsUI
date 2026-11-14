@@ -79,6 +79,12 @@ internal interface RootsListHandler {
   fun onDisplayStateChange()
 
   /**
+   * Redraw app launchers if their enabled state changed
+   * due to tapjacking protection.
+   */
+  fun refreshItems()
+
+  /**
    * Check if the adapter has been initialized or not.
    */
   fun isAdapterInitialized(): Boolean

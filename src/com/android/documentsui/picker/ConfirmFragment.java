@@ -23,7 +23,9 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Button;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -64,6 +66,7 @@ public class ConfirmFragment extends DocumentsUIDialogFragment {
         mTarget = arg.getParcelable(Shared.EXTRA_DOC);
         mType = arg.getInt(CONFIRM_TYPE);
         final PickResult pickResult = ((PickActivity) getActivity()).getInjector().pickResult;
+        final BaseActivity activity = (BaseActivity) getActivity();
 
         final MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
         switch (mType) {
@@ -84,7 +87,6 @@ public class ConfirmFragment extends DocumentsUIDialogFragment {
                 break;
             case TYPE_OEPN_TREE:
                 final Uri treeUri = mTarget.getTreeDocumentUri();
-                final BaseActivity activity = (BaseActivity) getActivity();
                 final String target = activity.getCurrentTitle();
                 // TODO(b/456014591): Remove the empty string once the translation is done.
                 //  We remove one argument during the string update but still pass the empty string
@@ -112,6 +114,20 @@ public class ConfirmFragment extends DocumentsUIDialogFragment {
                 (DialogInterface dialog, int id) -> pickResult.increaseActionCount());
 
         Dialog dialog = builder.create();
+
+        // Disable confirm button while tapjacking protection
+        // is in effect to protect against actions that would
+        // give access to whole directories or overwrite files.
+        dialog.setOnShowListener(d -> {
+            final Button button = ((AlertDialog) d).getButton(DialogInterface.BUTTON_POSITIVE);
+            activity.setConfirmButtonUpdater(() -> {
+                final boolean enabled = !activity.getDisplayState().itemsDisabled;
+                button.setEnabled(enabled);
+                button.setAlpha(enabled ? 1.0f : 0.5f);
+            });
+        });
+        dialog.setOnDismissListener(d -> activity.setConfirmButtonUpdater(null));
+
         if (SdkLevel.isAtLeastS()) {
             dialog.getWindow().setHideOverlayWindows(true);
         }

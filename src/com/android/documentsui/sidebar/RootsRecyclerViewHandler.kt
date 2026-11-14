@@ -87,6 +87,10 @@ internal class RootsRecyclerViewHandler(private val recyclerView: RecyclerView) 
     recyclerView.adapter = null
   }
 
+  override fun refreshItems() {
+    adapter?.notifyDataSetChanged()
+  }
+
   override fun onDisplayStateChange() {
     // Intentionally doing nothing.
   }

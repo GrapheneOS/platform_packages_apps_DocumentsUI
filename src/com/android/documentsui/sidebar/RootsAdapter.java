@@ -19,7 +19,6 @@ package com.android.documentsui.sidebar;
 import static com.android.documentsui.util.FlagUtils.isUseMaterial3FlagEnabled;
 import static com.android.documentsui.util.Material3Config.getRes;
 
-import android.app.Activity;
 import android.os.Looper;
 import android.view.View;
 import android.view.View.OnDragListener;
@@ -27,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.android.documentsui.BaseActivity;
 import com.android.documentsui.R;
 
 import java.util.HashMap;
@@ -48,14 +48,16 @@ class RootsAdapter extends ArrayAdapter<Item> {
     private static long sNextAvailableId;
 
     private final OnDragListener mDragListener;
+    private final BaseActivity mActivity;
 
     public RootsAdapter(
-            Activity activity,
+            BaseActivity activity,
             List<Item> items,
             OnDragListener dragListener) {
         super(activity, 0, items);
 
         mDragListener = dragListener;
+        mActivity = activity;
     }
 
     @Override
@@ -87,6 +89,19 @@ class RootsAdapter extends ArrayAdapter<Item> {
         final Item item = getItem(position);
         final View view = item.getView(convertView, parent);
 
+        final boolean enabled = isEnabled(position);
+        final boolean fullyVisible = isFullyVisible(position);
+        view.setEnabled(enabled);
+        view.setAlpha(fullyVisible ? 1.0f : 0.5f);
+        final View actionIcon = view.findViewById(getRes(R.id.action_icon));
+        if (actionIcon != null) {
+            actionIcon.setEnabled(enabled);
+        }
+        final View actionIconArea = view.findViewById(getRes(R.id.action_icon_area));
+        if (actionIconArea != null) {
+            actionIconArea.setEnabled(enabled);
+        }
+
         if (isUseMaterial3FlagEnabled()) {
             // In order to have hover showing on the list item, we need to have
             // "android:clickable=true" on the list item level, which will break the click handler
@@ -114,7 +129,20 @@ class RootsAdapter extends ArrayAdapter<Item> {
 
     @Override
     public boolean isEnabled(int position) {
-        return getItemViewType(position) != TYPE_SPACER;
+        if (getItemViewType(position) == TYPE_SPACER) {
+            return false;
+        }
+        return isFullyVisible(position);
+    }
+
+    private boolean isFullyVisible(int position) {
+        if (getItemViewType(position) == TYPE_ROOT_AND_APP ||
+                getItemViewType(position) == TYPE_APP) {
+            if (mActivity.getDisplayState().itemsDisabled) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
